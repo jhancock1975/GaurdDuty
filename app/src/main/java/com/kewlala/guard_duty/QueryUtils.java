@@ -14,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,12 +25,15 @@ import java.util.List;
  */
 public final class QueryUtils {
 
-    public static final String features_key = "features";
-    public static final String place_key = "place";
+    public static final String response_key = "response";
+    public static final String results_key = "results";
     public static final String time_key = "time";
-    public static final String magnitude_key = "mag";
-    public static final String properties_key = "properties";
-    public static final String uri_key = "url";
+    public static final String title_key = "webTitle";
+    public static final String date_published_key = "webPublicationDate";
+    public static final String uri_key = "webUrl";
+    public static final String fields_key = "fields";
+    public static final String author_key = "byline";
+    public static final String LOG_TAG = "QueryUtils";
 
     /**
      * Create a private constructor because no one should ever create a {@link QueryUtils} object.
@@ -42,22 +47,23 @@ public final class QueryUtils {
      * returns initial one-element list to display
      * while app is fetching earthquake data from USGS
      */
-    public static List<QuakeListItem> getInitialList() {
-        Log.d(EarthquakeActivity.LOG_TAG, "getInitialList");
-        ArrayList<QuakeListItem> list = new ArrayList<QuakeListItem>();
+    public static List<NewsListItem> getInitialList() {
+        Log.d(LOG_TAG, "getInitialList");
+        ArrayList<NewsListItem> list = new ArrayList<NewsListItem>();
         return list;
     }
 
     /**
-     * Return a list of {@link QuakeListItem} objects that has been built up from
+     * Return a list of {@link NewsListItem} objects that has been built up from
      * parsing a JSON response.
      */
-    public static ArrayList<QuakeListItem> extractEarthquakes(String urlQuery) {
+    public static ArrayList<NewsListItem> getNews(String urlQuery) {
 
-        Log.d(EarthquakeActivity.LOG_TAG, "extractEarthQuakes:: starting");
+        Log.d(LOG_TAG, "getNews:: starting");
+        Log.d(LOG_TAG, "urlQuery = " + urlQuery);
 
-        // Create an empty ArrayList that we can start adding earthquakes to
-        ArrayList<QuakeListItem> earthquakes = new ArrayList<>();
+        // Create an empty ArrayList that we can start adding articles to
+        ArrayList<NewsListItem> articles = new ArrayList<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
@@ -66,30 +72,45 @@ public final class QueryUtils {
 
             URL url = createUrl(urlQuery);
 
-            JSONObject quakeObj = new JSONObject(makeHttpRequest(url));
-            JSONArray featuresArr = quakeObj.getJSONArray(features_key);
-            int len = featuresArr.length();
+            JSONObject queryResult = new JSONObject(makeHttpRequest(url));
+            JSONObject response = queryResult.getJSONObject(response_key);
+            JSONArray resultsArr = response.getJSONArray(results_key);
+            int len = resultsArr.length();
             for (int i = 0; i < len; i++) {
-                JSONObject curFeature = featuresArr.getJSONObject(i);
-                JSONObject curProperties = curFeature.getJSONObject(properties_key);
-                QuakeListItem listItem = new QuakeListItem(curProperties.getDouble(magnitude_key),
-                        curProperties.getString(place_key),
-                        new Date(curProperties.getLong(time_key)),
-                        curProperties.getString(uri_key));
-                earthquakes.add(listItem);
+                JSONObject curArticle = resultsArr.getJSONObject(i);
+
+                Date articleDate=null;
+                try {
+                    articleDate = parseDate(curArticle.getString(date_published_key));
+                } catch (ParseException e){
+                    Log.d(LOG_TAG, "unable to parse date: "
+                            + curArticle.getString(date_published_key), e);
+                }
+
+                NewsListItem listItem = new NewsListItem(curArticle.getString(title_key),
+                        curArticle.getString(author_key),
+                        articleDate,
+                        curArticle.getString(uri_key));
+                articles.add(listItem);
             }
 
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
-            Log.e(EarthquakeActivity.LOG_TAG, "Problem parsing the earthquake JSON results",
+            Log.e(NewsActivity.LOG_TAG, "Problem parsing the earthquake JSON results",
                     e);
         } catch (IOException e) {
-            Log.e(EarthquakeActivity.LOG_TAG, "i/o exception making http request", e);
+            Log.e(NewsActivity.LOG_TAG, "i/o exception making http request", e);
         }
-        // Return the list of earthquakes
-        return earthquakes;
+        // Return the list of articles
+        return articles;
+    }
+
+    private static SimpleDateFormat articleDateFormat
+            = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static Date parseDate(String string) throws ParseException {
+        return articleDateFormat.parse(string);
     }
 
     /**
@@ -100,7 +121,7 @@ public final class QueryUtils {
         try {
             url = new URL(stringUrl);
         } catch (MalformedURLException e) {
-            Log.e(EarthquakeActivity.LOG_TAG, "Error with creating URL ", e);
+            Log.e(NewsActivity.LOG_TAG, "Error with creating URL ", e);
         }
         return url;
     }
@@ -128,11 +149,11 @@ public final class QueryUtils {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {
-                Log.e(EarthquakeActivity.LOG_TAG, "Error response code: "
+                Log.e(NewsActivity.LOG_TAG, "Error response code: "
                         + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(EarthquakeActivity.LOG_TAG, "Problem retrieving the earthquake " +
+            Log.e(NewsActivity.LOG_TAG, "Problem retrieving the earthquake " +
                     "JSON results.", e);
         } finally {
             if (urlConnection != null) {

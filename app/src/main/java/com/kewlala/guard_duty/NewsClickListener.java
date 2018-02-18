@@ -12,13 +12,13 @@ import android.widget.AdapterView;
  * hard to read.
  */
 
-class QuakeClickListener implements android.widget.AdapterView.OnItemClickListener {
+class NewsClickListener implements android.widget.AdapterView.OnItemClickListener {
 
-    private static final String LOG_TAG = QuakeClickListener.class.getName();
+    private static final String LOG_TAG = NewsClickListener.class.getName();
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        QuakeListItem item = (QuakeListItem) adapterView.getItemAtPosition(i);
+        NewsListItem item = (NewsListItem) adapterView.getItemAtPosition(i);
 
         Log.d(LOG_TAG, "onItemClick::uri = " + item.getUrl());
 

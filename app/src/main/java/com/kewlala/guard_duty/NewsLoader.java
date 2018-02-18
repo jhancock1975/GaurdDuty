@@ -15,9 +15,9 @@ import java.util.List;
  * Created by jhancock2010 on 2/6/18.
  */
 
-public class EarthquakeLoader extends AsyncTaskLoader<List<QuakeListItem>> {
+public class NewsLoader extends AsyncTaskLoader<List<NewsListItem>> {
     public static final int EARTHQUAKE_LOADER_ID=1;
-    public EarthquakeLoader(@NonNull Context context, String urlQuery) {
+    public NewsLoader(@NonNull Context context, String urlQuery) {
         super(context);
         this.urlQuery = urlQuery;
     }
@@ -26,9 +26,9 @@ public class EarthquakeLoader extends AsyncTaskLoader<List<QuakeListItem>> {
 
     @Nullable
     @Override
-    public List<QuakeListItem> loadInBackground() {
-        Log.d(EarthquakeActivity.LOG_TAG, "doInBackground::begin");
-        return QueryUtils.extractEarthquakes(this.urlQuery);
+    public List<NewsListItem> loadInBackground() {
+        Log.d(NewsActivity.LOG_TAG, "doInBackground::begin");
+        return QueryUtils.getNews(this.urlQuery);
     }
 
     public String getUrlQuery() {
@@ -41,7 +41,7 @@ public class EarthquakeLoader extends AsyncTaskLoader<List<QuakeListItem>> {
 
     @Override
     protected void onStartLoading() {
-        Log.d(EarthquakeActivity.LOG_TAG, "onStartLoading begin");
+        Log.d(NewsActivity.LOG_TAG, "onStartLoading begin");
         forceLoad();
     }
 

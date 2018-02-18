@@ -47,14 +47,14 @@
         <item name="android:dividerHeight">0dp</item>
     </style>
 
-    <style name="quake_list_two_rows">
+    <style name="news_list_two_columns">
         <item name="android:paddingLeft">8dp</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">4</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:orientation">vertical</item>
+        <item name="android:orientation">horizontal</item>
     </style>
 
     <style name="style_quake_list_item_darker_text">
@@ -78,7 +78,7 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="style_quake_list_magnitude">
+    <style name="style_section_name">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_marginLeft">16dp</item>
         <item name="android:layout_marginRight">16dp</item>
@@ -102,5 +102,15 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="news_list_one_row">
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">4</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
     </style>
 </resources>

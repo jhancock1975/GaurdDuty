@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,37 +38,43 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<QuakeListItem>> {
+public class NewsActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<NewsListItem>> {
 
-    public static final String LOG_TAG = EarthquakeActivity.class.getName();
+    public static final String LOG_TAG = NewsActivity.class.getName();
 
-    public static final String BASE_URL = "https://earthquake.usgs.gov";
-    public static final String PATH = "/fdsnws/event/1/query";
+    public static final String BASE_URL = "https://content.guardianapis.com";
+    public static final String PATH = "/search";
 
-    private QuakeArrayAdapter adapter;
-    private ListView earthquakeListView;
+    private NewsArrayAdapter adapter;
+    private ListView newsArticleListView;
+    private String apikey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         Log.d(LOG_TAG, "onCreate::starting up");
         super.onCreate(savedInstanceState);
+
+        apikey = new AssetsPropertyReader(this)
+                .getProperties("apikey.properties")
+                .getProperty("apikey");
+
         setContentView(R.layout.earthquake_activity);
 
 
         // Find a reference to the {@link ListView} in the layout
-        earthquakeListView = (ListView) findViewById(R.id.list);
-        earthquakeListView.setOnItemClickListener(new QuakeClickListener());
+        newsArticleListView = (ListView) findViewById(R.id.list);
+        newsArticleListView.setOnItemClickListener(new NewsClickListener());
 
         
 
         // Create a new {@link ArrayAdapter} of earthquakes
-        adapter = new QuakeArrayAdapter(this, new ArrayList<QuakeListItem>());
+        adapter = new NewsArrayAdapter(this, new ArrayList<NewsListItem>());
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
-        earthquakeListView.setAdapter(adapter);
+        newsArticleListView.setAdapter(adapter);
         
         //check network status if network is available, show progress bar
         //and load earthquakes, otherwise show message that network is not available
@@ -76,11 +83,11 @@ public class EarthquakeActivity extends AppCompatActivity
             //using async task loader
             ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
             progressBar.setVisibility(View.VISIBLE);
-            getLoaderManager().initLoader(EarthquakeLoader.EARTHQUAKE_LOADER_ID, null,
+            getLoaderManager().initLoader(NewsLoader.EARTHQUAKE_LOADER_ID, null,
                     this);
         } else {
             TextView notConnected = (TextView) findViewById(R.id.text_not_connected);
-            earthquakeListView.setEmptyView(notConnected);
+            newsArticleListView.setEmptyView(notConnected);
             notConnected.setVisibility(View.VISIBLE);
         }
     }
@@ -101,44 +108,34 @@ public class EarthquakeActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<List<QuakeListItem>> onCreateLoader(int i, Bundle bundle) {
-        Log.d(EarthquakeActivity.LOG_TAG, "oncreateLoader::begin");
+    public Loader<List<NewsListItem>> onCreateLoader(int i, Bundle bundle) {
+        Log.d(NewsActivity.LOG_TAG, "oncreateLoader::begin");
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        String minMagnitude = sharedPrefs.getString(
-                getString(R.string.settings_min_magnitude_key),
-                getString(R.string.settings_min_magnitude_default));
+        String tag = sharedPrefs.getString(
+                getString(R.string.settings_tag_key), getString(R.string.settings_tag_default));
 
 
-
-        String orderBy = sharedPrefs.getString(
-                getString(R.string.settings_order_by_key),
-                getString(R.string.settings_order_by_default)
-        );
-
-        String maxResults = sharedPrefs.getString(
-                getString(R.string.settings_max_results_key),
-                getString(R.string.settings_max_results_default));
-
-
-
-        Uri baseUri = Uri.parse(EarthquakeActivity.BASE_URL + PATH);
+        Uri baseUri = Uri.parse(NewsActivity.BASE_URL + PATH);
 
         Uri.Builder uriBuilder = baseUri.buildUpon();
-        uriBuilder.appendQueryParameter("format", "geojson");
-        uriBuilder.appendQueryParameter("limit", maxResults);
-        uriBuilder.appendQueryParameter("minmag", minMagnitude);
-        uriBuilder.appendQueryParameter("orderby", orderBy);
+        uriBuilder.appendQueryParameter("api-key", this.apikey);
 
+        if ( ! TextUtils.isEmpty(tag)){
+            uriBuilder.appendQueryParameter("tag", tag);
+        }
 
-        return new EarthquakeLoader(this, uriBuilder.toString());
+        //get the article author
+        uriBuilder.appendQueryParameter("show-fields", "byline");
+
+        return new NewsLoader(this, uriBuilder.toString());
     }
 
     @Override
-    public void onLoadFinished(Loader<List<QuakeListItem>> loader,
-                               List<QuakeListItem> quakeListItems) {
-        Log.d(EarthquakeActivity.LOG_TAG, "onLoadFinished begin");
+    public void onLoadFinished(Loader<List<NewsListItem>> loader,
+                               List<NewsListItem> newsListItems) {
+        Log.d(NewsActivity.LOG_TAG, "onLoadFinished begin");
 
         //hide the progress bar
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.loading_spinner);
@@ -150,22 +147,22 @@ public class EarthquakeActivity extends AppCompatActivity
             notConnected.setVisibility(View.GONE);
 
             TextView empty = (TextView) findViewById(R.id.empty);
-            earthquakeListView.setEmptyView(empty);
+            newsArticleListView.setEmptyView(empty);
             empty.setVisibility(View.VISIBLE);
             adapter.clear();
 
-            adapter.setEarthquakes(quakeListItems);
+            adapter.setEarthquakes(newsListItems);
         } else {
             TextView notConnected = (TextView) findViewById(R.id.text_not_connected);
-            earthquakeListView.setEmptyView(notConnected);
+            newsArticleListView.setEmptyView(notConnected);
             notConnected.setVisibility(View.VISIBLE);
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<List<QuakeListItem>> loader) {
-        Log.d(EarthquakeActivity.LOG_TAG, "onLoaderRest begin");
+    public void onLoaderReset(Loader<List<NewsListItem>> loader) {
+        Log.d(NewsActivity.LOG_TAG, "onLoaderRest begin");
         adapter.setEarthquakes(QueryUtils.getInitialList());
     }
 

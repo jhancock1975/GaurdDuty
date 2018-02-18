@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/quake_list_root_layout">
+
+    <TextView
+        android:id="@+id/section_name"
+        style="@style/style_section_name" />
+
+    <!-- show the title of the article-->
+    <LinearLayout style="@style/news_list_one_row">
+
+        <TextView
+            android:id="@+id/text_view_news_article_title"
+            style="@style/style_quake_list_item_direction" />
+
+    </LinearLayout>
+
+    <!-- show the date and time in two rows -->
+    <LinearLayout style="@style/news_list_two_columns">
+
+        <TextView
+            android:id="@+id/text_view_article_date"
+            style="@style/style_date_time_text" />
+
+        <TextView
+            android:id="@+id/text_view_article_time"
+            style="@style/style_date_time_text" />
+
+        <TextView
+            android:id="@+id/text_view_article_author"
+            style="@style/style_date_time_text" />
+    </LinearLayout>
+</LinearLayout>

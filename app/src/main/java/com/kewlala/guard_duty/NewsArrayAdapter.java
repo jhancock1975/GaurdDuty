@@ -1,7 +1,6 @@
 package com.kewlala.guard_duty;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -14,17 +13,16 @@ import android.widget.TextView;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by jhancock2010 on 1/27/18.
  */
 
-class QuakeArrayAdapter extends ArrayAdapter<QuakeListItem> {
+class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
 
 
-    public QuakeArrayAdapter(Activity context, List<QuakeListItem> earthquakes) {
+    public NewsArrayAdapter(Activity context, List<NewsListItem> earthquakes) {
         super(context, 0, earthquakes);
         this.earthquakes = earthquakes;
     }
@@ -32,8 +30,8 @@ class QuakeArrayAdapter extends ArrayAdapter<QuakeListItem> {
     private static DateFormat listItemDateFormat = new SimpleDateFormat("MMM dd, yyyy ");
     private static DateFormat listItemTimeFormat = new SimpleDateFormat("HH:mm:ss a");
     private static DecimalFormat magnitudeFormat = new DecimalFormat("0.0");
-    List<QuakeListItem> earthquakes;
-    public static final String LOG_TAG = QuakeArrayAdapter.class.getName();
+    List<NewsListItem> earthquakes;
+    public static final String LOG_TAG = NewsArrayAdapter.class.getName();
 
     /**
      * Provides a view for an AdapterView (ListView, GridView, etc.)
@@ -50,92 +48,81 @@ class QuakeArrayAdapter extends ArrayAdapter<QuakeListItem> {
         View listItemView = convertView;
         if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.quake_list_item, parent, false);
+                    R.layout.news_list_item, parent, false);
         }
 
 
-        QuakeListItem quakeListItem = getItem(position);
+        NewsListItem newsListItem = getItem(position);
 
         // Find the TextViews and set their text
-        TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.quake_list_magnitude);
-        magnitudeTextView.setText(magnitudeFormat.format(quakeListItem.getMagnitude()));
+        TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.section_name);
+        char titleFirstChar = newsListItem.getTitle().toUpperCase().trim().charAt(0);
+        magnitudeTextView.setText(titleFirstChar);
 
         // Set the proper background color on the magnitude circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeTextView.getBackground();
 
         // Get the appropriate background color based on the current earthquake magnitude
-        int magnitudeColor = getMagnitudeColor(quakeListItem.getMagnitude());
+        int magnitudeColor = getSubjectColor(titleFirstChar);
 
         // Set the color on the magnitude circle
         magnitudeCircle.setColor(ContextCompat.getColor(getContext(), magnitudeColor));
 
 
-        TextView locationDirectionTextView =
-                (TextView) listItemView.findViewById(R.id.quake_list_location_direction);
-        TextView locationPlaceTextView =
-                (TextView) listItemView.findViewById(R.id.quake_list_location_place_name);
+        ((TextView) listItemView.findViewById(R.id.text_view_news_article_title))
+                .setText(newsListItem.getTitle());
+
+        TextView dateTextView = (TextView) listItemView.findViewById(R.id.text_view_article_date);
+        dateTextView.setText(listItemDateFormat.format(newsListItem.getDate()));
+
+        TextView timeTextView = (TextView) listItemView.findViewById(R.id.text_view_article_time);
+        timeTextView.setText(listItemTimeFormat.format(newsListItem.getDate()));
 
 
-        try {
-            String[] locationSplit = quakeListItem.getLocation()
-                    .split(getContext().getString(R.string.location_seperator));
-
-            for (String s: locationSplit){
-                Log.d(LOG_TAG, "QuakeArrayAdapter::getView location" +
-                        "split element = " + s + ".");
-
-            }
-            Log.d(LOG_TAG, "***");
-
-
-            locationDirectionTextView.setText(locationSplit[0].trim()
-                    + " " + getContext().getString(R.string.location_seperator));
-            locationPlaceTextView.setText(locationSplit[1].trim());
-
-        } catch (ArrayIndexOutOfBoundsException e) {
-            locationDirectionTextView.setText(quakeListItem.getLocation());
-        }
-
-        TextView dateTextView = (TextView) listItemView.findViewById(R.id.quake_list_date);
-        dateTextView.setText(listItemDateFormat.format(quakeListItem.getDate()));
-
-        TextView timeTextView = (TextView) listItemView.findViewById(R.id.quake_list_time);
-        timeTextView.setText(listItemTimeFormat.format(quakeListItem.getDate()));
+        TextView authorTextView = (TextView) listItemView.findViewById(R.id.text_view_article_author);
+        authorTextView.setText(listItemTimeFormat.format(newsListItem.getDate()));
 
         // Return the whole list item layout
         // so that it can be shown in the ListView
         return listItemView;
     }
 
+    /**
+     * choose color baseed on frequency of first letter of word in the English language.
+     * We use the data from:
+     * https://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_the_first_letters_of_a_word_in_the_English_language
+     *
+     * @param firstLetter first letter of article title
+     * @return color of dot next to article
+     */
+    private int getSubjectColor(char firstLetter) {
 
-    private int getMagnitudeColor(double magnitude) {
-        int magnitude_trunc = (int)magnitude;
-        switch(magnitude_trunc){
-            case 1:
+        switch(firstLetter){
+            case 't':
                 return R.color.magnitude1;
-            case 2:
+            case 'a':
                 return R.color.magnitude2;
-            case 3:
+            case 'o':
                 return R.color.magnitude3;
-            case 4:
+            case 'i':
                 return R.color.magnitude4;
-            case 5:
+            case 's':
                 return R.color.magnitude5;
-            case 6:
+            case 'w':
                 return R.color.magnitude6;
-            case 7:
+            case 'c':
                 return R.color.magnitude7;
-            case 8:
+            case 'b':
                 return R.color.magnitude8;
-            case 9:
+            case 'p':
                 return R.color.magnitude9;
             default:
                 return R.color.magnitude10plus;
         }
     }
 
-    public void setEarthquakes(List<QuakeListItem> earthquakes){
+    public void setEarthquakes(List<NewsListItem> earthquakes){
         if (earthquakes != null && earthquakes.size() > 0 && this.earthquakes != null) {
             this.earthquakes.clear();
             this.earthquakes.addAll(earthquakes);

@@ -16,21 +16,15 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
     }
 
-    public static class EarthquakePreferenceFragment extends PreferenceFragment
+    public static class NewsReaderPreferenceFragment extends PreferenceFragment
     implements Preference.OnPreferenceChangeListener{
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings_main);
 
-            Preference minMagnitude = findPreference(getString(R.string.settings_min_magnitude_key));
-            bindPreferenceSummaryToValue(minMagnitude);
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.settings_tag_key)));
 
-            Preference maxResults = findPreference(getString(R.string.settings_max_results_key));
-            bindPreferenceSummaryToValue(maxResults);
-
-            Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
-            bindPreferenceSummaryToValue(orderBy);
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
