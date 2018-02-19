@@ -33,6 +33,7 @@ public final class QueryUtils {
     public static final String uri_key = "webUrl";
     public static final String fields_key = "fields";
     public static final String author_key = "byline";
+    public static final String section_name_key = "sectionName";
     public static final String LOG_TAG = "QueryUtils";
 
     /**
@@ -90,7 +91,8 @@ public final class QueryUtils {
                 NewsListItem listItem = new NewsListItem(curArticle.getString(title_key),
                         curArticle.getJSONObject(fields_key).getString(author_key),
                         articleDate,
-                        curArticle.getString(uri_key));
+                        curArticle.getString(uri_key),
+                        curArticle.getString(section_name_key));
                 articles.add(listItem);
             }
 

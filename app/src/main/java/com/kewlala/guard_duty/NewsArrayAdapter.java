@@ -56,15 +56,15 @@ class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
 
         // Find the TextViews and set their text
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.section_name);
-        char titleFirstChar = newsListItem.getTitle().toUpperCase().trim().charAt(0);
-        magnitudeTextView.setText(titleFirstChar+"");
+        char sectionFirstChar = newsListItem.getSection().toUpperCase().trim().charAt(0);
+        magnitudeTextView.setText(sectionFirstChar+"");
 
         // Set the proper background color on the magnitude circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeTextView.getBackground();
 
         // Get the appropriate background color based on the current earthquake magnitude
-        int magnitudeColor = getSubjectColor(titleFirstChar);
+        int magnitudeColor = getSubjectColor(sectionFirstChar);
 
         // Set the color on the magnitude circle
         magnitudeCircle.setColor(ContextCompat.getColor(getContext(), magnitudeColor));
@@ -72,6 +72,9 @@ class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
 
         ((TextView) listItemView.findViewById(R.id.text_view_news_article_title))
                 .setText(newsListItem.getTitle());
+
+        ((TextView) listItemView.findViewById(R.id.section_name_full))
+                .setText(newsListItem.getSection());
 
         TextView dateTextView = (TextView) listItemView.findViewById(R.id.text_view_article_date);
         dateTextView.setText(listItemDateFormat.format(newsListItem.getDate()));
@@ -82,6 +85,7 @@ class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
 
         TextView authorTextView = (TextView) listItemView.findViewById(R.id.text_view_article_author);
         authorTextView.setText(listItemTimeFormat.format(newsListItem.getDate()));
+
 
         // Return the whole list item layout
         // so that it can be shown in the ListView
@@ -99,23 +103,23 @@ class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
     private int getSubjectColor(char firstLetter) {
 
         switch(firstLetter){
-            case 't':
+            case 'T':
                 return R.color.magnitude1;
-            case 'a':
+            case 'A':
                 return R.color.magnitude2;
-            case 'o':
+            case 'O':
                 return R.color.magnitude3;
-            case 'i':
+            case 'I':
                 return R.color.magnitude4;
-            case 's':
+            case 'S':
                 return R.color.magnitude5;
-            case 'w':
+            case 'W':
                 return R.color.magnitude6;
-            case 'c':
+            case 'C':
                 return R.color.magnitude7;
-            case 'b':
+            case 'B':
                 return R.color.magnitude8;
-            case 'p':
+            case 'P':
                 return R.color.magnitude9;
             default:
                 return R.color.magnitude10plus;

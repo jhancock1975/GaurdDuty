@@ -9,18 +9,19 @@ import java.util.Date;
 
 public class NewsListItem {
 
-    public NewsListItem(String title, String author, Date date, String url) {
-        this.title= title;
-        this.author = author;
-        this.date = date;
-        this.url = url;
-    }
-
-
     private String title;
     private String author;
     private Date date;
     private String url;
+    private String section;
+
+    public NewsListItem(String title, String author, Date date, String url, String section) {
+        this.title = title;
+        this.author = author;
+        this.date = date;
+        this.url = url;
+        this.section = section;
+    }
 
     public String getTitle() {
         return title;
@@ -52,5 +53,14 @@ public class NewsListItem {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+
+    public String getSection() {
+        return section;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
     }
 }
