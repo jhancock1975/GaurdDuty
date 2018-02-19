@@ -88,7 +88,7 @@ public final class QueryUtils {
                 }
 
                 NewsListItem listItem = new NewsListItem(curArticle.getString(title_key),
-                        curArticle.getString(author_key),
+                        curArticle.getJSONObject(fields_key).getString(author_key),
                         articleDate,
                         curArticle.getString(uri_key));
                 articles.add(listItem);
@@ -109,7 +109,17 @@ public final class QueryUtils {
 
     private static SimpleDateFormat articleDateFormat
             = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-    private static Date parseDate(String string) throws ParseException {
+
+    /**
+     * parse date from API - caveat! JSON string for date is surrounded with double quotes
+     * and, we have to replace the 'Z' with a +0000 for GMT
+     * @param string
+     * @return
+     * @throws ParseException
+     */
+    private static Date parseDate(String string) throws ParseException{
+        string = string.replaceAll("\"", "").replaceAll("Z","+0000");
+        Log.d(LOG_TAG  , "date = ***" + string +"***");
         return articleDateFormat.parse(string);
     }
 

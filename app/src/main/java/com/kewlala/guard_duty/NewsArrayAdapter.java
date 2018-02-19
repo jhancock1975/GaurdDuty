@@ -57,7 +57,7 @@ class NewsArrayAdapter extends ArrayAdapter<NewsListItem> {
         // Find the TextViews and set their text
         TextView magnitudeTextView = (TextView) listItemView.findViewById(R.id.section_name);
         char titleFirstChar = newsListItem.getTitle().toUpperCase().trim().charAt(0);
-        magnitudeTextView.setText(titleFirstChar);
+        magnitudeTextView.setText(titleFirstChar+"");
 
         // Set the proper background color on the magnitude circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
